@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全球每日財經焦點 | Global Financial Digest</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --card-bg: #161b22;
+            --border: #30363d;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --accent: #58a6ff;
+            --badge-bg: rgba(56, 139, 253, 0.15);
+            --importance-bg: rgba(240, 136, 62, 0.1);
+            --importance-text: #f0883e;
+            --bullet-color: #3fb950;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+            background-color: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 24px 16px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tagline {
+            display: inline-block;
+            background: var(--badge-bg);
+            color: var(--accent);
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+
+        .update-time {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .news-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .news-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 24px;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .news-card:hover {
+            transform: translateY(-2px);
+            border-color: #58a6ff66;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .source-tag {
+            font-size: 0.8rem;
+            color: var(--accent);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .rank-num {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: bold;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+
+        .original-title {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-bottom: 14px;
+        }
+
+        .importance-box {
+            background-color: var(--importance-bg);
+            border-left: 3px solid var(--importance-text);
+            color: #e6edf3;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-bottom: 14px;
+            font-weight: 500;
+        }
+
+        .key-points {
+            list-style: none;
+            margin-bottom: 16px;
+        }
+
+        .key-points li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            color: #c9d1d9;
+        }
+
+        .key-points li::before {
+            content: "•";
+            position: absolute;
+            left: 4px;
+            color: var(--bullet-color);
+            font-weight: bold;
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        .read-more {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .read-more:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="tagline">AI FINANCIAL INTELLIGENCE</div>
+            <h1>全球每日財經焦點</h1>
+            <div class="update-time">最後更新時間：2026-09-10 18:58:32</div>
+        </header>
+
+        <main class="news-list">
+            <article class="news-card">
+    <div class="card-header">
+        <span class="source-tag">Yahoo Finance</span>
+        <span class="rank-num">#1</span>
+    </div>
+    <h2 class="card-title">微軟推動「有效良率」測試：對輝達 AI 經濟學與硬體回報率帶來嚴峻考驗</h2>
+    <div class="original-title">Microsoft’s ‘Useful Yield’ Test Raises the Stakes for NVIDIA’s AI Economics</div>
+    
+    <div class="importance-box">
+        💡 <strong>市場洞察：</strong>此舉揭示科技巨頭對 AI 巨額資本支出的回報率審視日益嚴苛，將直接影響輝達等晶片巨擘的未來定價權與市場估值。
+    </div>
+
+    <ul class="key-points">
+        <li>微軟開始採用『有效良率』作為新衡量指標，嚴格評估 AI 晶片在實際部署中的運算效益與真實商業回報。</li><li>超大型雲端業者（CSP）正從『無差別搶購算力』轉向『追求資本回報率』，迫使供應商證明昂貴晶片的經濟合理性。</li><li>此轉變暗示全球 AI 產業鏈已步入重視硬體變現效率的新階段，增添了市場對高估值 AI 供應鏈的隱憂。</li>
+    </ul>
+
+    <a href="https://finance.yahoo.com/technology/ai/articles/microsoft-useful-yield-test-raises-225832059.html" target="_blank" rel="noopener noreferrer" class="read-more">
+        閱讀完整原文 ↗
+    </a>
+</article>
+<article class="news-card">
+    <div class="card-header">
+        <span class="source-tag">CNBC Finance</span>
+        <span class="rank-num">#2</span>
+    </div>
+    <h2 class="card-title">跨國支付巨頭聯手！螞蟻國際攜手 Visa 與萬事達卡打造 AI 代理人支付新標準</h2>
+    <div class="original-title">Ant International partners with Visa, Mastercard on developing AI payments</div>
+    
+    <div class="importance-box">
+        💡 <strong>市場洞察：</strong>宣告全球金融基礎設施正式邁入 AI 自主交易時代，為未來自動化經濟體系奠定標準與安全基石。
+    </div>
+
+    <ul class="key-points">
+        <li>螞蟻國際與 Visa、Mastercard 跨國合作，致力於建立針對 AI 代理人（AI Agents）發起交易的全球統一支付標準。</li><li>合作重點聚焦於開發新一代身份驗證與風險監控機制，確保 AI 自主決策下的交易安全與防偽合規。</li><li>此舉標誌著金融科技從傳統『人機互動』跨入『機器對機器（M2M）』商業運作的關鍵轉折點。</li>
+    </ul>
+
+    <a href="https://www.cnbc.com/2026/09/10/ant-international-visa-mastercard-ai-agent-payment-standard.html" target="_blank" rel="noopener noreferrer" class="read-more">
+        閱讀完整原文 ↗
+    </a>
+</article>
+<article class="news-card">
+    <div class="card-header">
+        <span class="source-tag">Yahoo Finance</span>
+        <span class="rank-num">#3</span>
+    </div>
+    <h2 class="card-title">美國能源供應緊縮加劇：對沖基金大舉湧入燃料市場看多</h2>
+    <div class="original-title">Hedge Funds Pile Into Fuels as U.S. Supply Squeeze Deepens</div>
+    
+    <div class="importance-box">
+        💡 <strong>市場洞察：</strong>成品油市場供需失衡觸發機構資金大規模進駐，能源價格回升恐對全球通膨降溫與央行降息預期構成威脅。
+    </div>
+
+    <ul class="key-points">
+        <li>受美國煉油供應瓶頸與庫存緊張影響，對沖基金等機構投資人正加速建立燃料衍生品的淨多頭部位。</li><li>投機資金與實體供需失衡相互作用，推升了汽柴油的精煉利差（Crack Spreads）與短期的市場波動度。</li><li>二次通膨風險若因能源成本上漲而再起，將直接影響美聯儲及全球主要央行的後續貨幣政策空間。</li>
+    </ul>
+
+    <a href="https://finance.yahoo.com/energy/articles/hedge-funds-pile-fuels-u-230000787.html" target="_blank" rel="noopener noreferrer" class="read-more">
+        閱讀完整原文 ↗
+    </a>
+</article>
+        </main>
+
+        <footer>
+            <p>由 Gemini AI 自動篩選與摘要 • 每日定時更新</p>
+        </footer>
+    </div>
+</body>
+</html>

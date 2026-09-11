@@ -1,0 +1,246 @@
+import os
+from datetime import datetime
+
+HTML_TEMPLATE = """<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全球每日財經焦點 | Global Financial Digest</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --card-bg: #161b22;
+            --border: #30363d;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --accent: #58a6ff;
+            --badge-bg: rgba(56, 139, 253, 0.15);
+            --importance-bg: rgba(240, 136, 62, 0.1);
+            --importance-text: #f0883e;
+            --bullet-color: #3fb950;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+            background-color: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 24px 16px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tagline {
+            display: inline-block;
+            background: var(--badge-bg);
+            color: var(--accent);
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+
+        .update-time {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .news-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .news-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 24px;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .news-card:hover {
+            transform: translateY(-2px);
+            border-color: #58a6ff66;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .source-tag {
+            font-size: 0.8rem;
+            color: var(--accent);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .rank-num {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: bold;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+
+        .original-title {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-bottom: 14px;
+        }
+
+        .importance-box {
+            background-color: var(--importance-bg);
+            border-left: 3px solid var(--importance-text);
+            color: #e6edf3;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-bottom: 14px;
+            font-weight: 500;
+        }
+
+        .key-points {
+            list-style: none;
+            margin-bottom: 16px;
+        }
+
+        .key-points li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            color: #c9d1d9;
+        }
+
+        .key-points li::before {
+            content: "•";
+            position: absolute;
+            left: 4px;
+            color: var(--bullet-color);
+            font-weight: bold;
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        .read-more {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .read-more:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="tagline">AI FINANCIAL INTELLIGENCE</div>
+            <h1>全球每日財經焦點</h1>
+            <div class="update-time">最後更新時間：__UPDATE_TIME__</div>
+        </header>
+
+        <main class="news-list">
+            __CARDS_HTML__
+        </main>
+
+        <footer>
+            <p>由 Gemini AI 自動篩選與摘要 • 每日定時更新</p>
+        </footer>
+    </div>
+</body>
+</html>
+"""
+
+def generate_html(digest_list, output_file="index.html"):
+    now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    cards = []
+
+    for rank, item in enumerate(digest_list, 1):
+        points_html = "".join([f"<li>{p}</li>" for p in item.get("key_points", [])])
+        source = item.get("source", "國際財經")
+        title_tw = item.get("title_tw", "")
+        original_title = item.get("original_title", "")
+        importance = item.get("importance", "")
+        link = item.get("link", "#")
+
+        card = f"""<article class="news-card">
+    <div class="card-header">
+        <span class="source-tag">{source}</span>
+        <span class="rank-num">#{rank}</span>
+    </div>
+    <h2 class="card-title">{title_tw}</h2>
+    <div class="original-title">{original_title}</div>
+    
+    <div class="importance-box">
+        💡 <strong>市場洞察：</strong>{importance}
+    </div>
+
+    <ul class="key-points">
+        {points_html}
+    </ul>
+
+    <a href="{link}" target="_blank" rel="noopener noreferrer" class="read-more">
+        閱讀完整原文 ↗
+    </a>
+</article>"""
+        cards.append(card)
+
+    full_html = HTML_TEMPLATE.replace("__UPDATE_TIME__", now_str).replace("__CARDS_HTML__", "\n".join(cards))
+
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write(full_html)
+
+    print(f"Webpage successfully generated at: {output_file}")
+    return output_file
