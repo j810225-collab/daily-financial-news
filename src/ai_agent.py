@@ -1,10 +1,13 @@
 import os
 import json
+import time
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
 load_dotenv()
+
+CANDIDATE_MODELS = ["gemini-3.6-flash", "gemini-2.5-flash"]
 
 def summarize_financial_news(articles, top_k=4):
     api_key = os.getenv("GEMINI_API_KEY")
@@ -50,25 +53,43 @@ def summarize_financial_news(articles, top_k=4):
 {news_text}
 """
 
-    response = client.models.generate_content(
-        model="gemini-3.6-flash",
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            temperature=0.2
-        )
-    )
+    # 指數退避重試與多模型切換保險
+    for model_name in CANDIDATE_MODELS:
+        for attempt in range(1, 4):
+            try:
+                print(f"[AI Agent] 正在嘗試使用模型 {model_name} (第 {attempt} 次)...")
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        temperature=0.2
+                    )
+                )
+                if response and response.text:
+                    digest = json.loads(response.text)
+                    if isinstance(digest, list) and len(digest) > 0:
+                        print(f"[AI Agent] 成功使用 {model_name} 完成分析！")
+                        return digest
+            except Exception as e:
+                print(f"[AI Agent] 模型 {model_name} 呼叫失敗: {e}")
+                if "503" in str(e) or "429" in str(e) or "UNAVAILABLE" in str(e):
+                    wait_sec = attempt * 5
+                    print(f"[AI Agent] 遇到伺服器壅塞 (503/429)，等待 {wait_sec} 秒後重試...")
+                    time.sleep(wait_sec)
+                else:
+                    break
 
-    try:
-        return json.loads(response.text)
-    except Exception as e:
-        print("Error parsing Gemini JSON response:", e)
-        print("Raw response:", response.text)
-        return []
-
-if __name__ == "__main__":
-    from news_fetcher import fetch_latest_news
-    raw_news = fetch_latest_news(4)
-    print("Fetched news, asking Gemini to analyze...")
-    digest = summarize_financial_news(raw_news, top_k=3)
-    print(json.dumps(digest, indent=2, ensure_ascii=False))
+    # 兜底降級保險：萬一全部失敗，絕對不讓程式閃退，自動轉為精選備用格式
+    print("[AI Agent] 警告：所有 AI 模型皆暫時無法連線，啟用降級防禦模式...")
+    fallback_digest = []
+    for a in articles[:top_k]:
+        fallback_digest.append({
+            "title_tw": a["title"],
+            "original_title": a["title"],
+            "source": a["source"],
+            "link": a["link"],
+            "importance": "即時國際重大新聞（AI 服務連線忙碌中，提供原文快訊）",
+            "key_points": [a.get("summary", "請點擊連結查看詳細報導。")[:100] + "..."]
+        })
+    return fallback_digest
