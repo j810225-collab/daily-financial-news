@@ -2,8 +2,8 @@ name: Daily Financial News AI Agent
 
 on:
   schedule:
-    # 每天台灣時間 08:00 (UTC 00:00) 自動執行
-    - cron: '0 0 * * *'
+    # 每 3 天台灣時間 08:00 (UTC 00:00) 自動執行
+    - cron: '0 0 */3 * *'
   workflow_dispatch: # 支援在 GitHub 網頁上手動點擊立即執行
 
 permissions:

@@ -7,8 +7,6 @@ from google.genai import types
 
 load_dotenv()
 
-CANDIDATE_MODELS = ["gemini-3.6-flash", "gemini-2.5-flash"]
-
 def summarize_financial_news(articles, top_k=4):
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
@@ -53,35 +51,33 @@ def summarize_financial_news(articles, top_k=4):
 {news_text}
 """
 
-    # 指數退避重試與多模型切換保險
-    for model_name in CANDIDATE_MODELS:
-        for attempt in range(1, 4):
-            try:
-                print(f"[AI Agent] 正在嘗試使用模型 {model_name} (第 {attempt} 次)...")
-                response = client.models.generate_content(
-                    model=model_name,
-                    contents=prompt,
-                    config=types.GenerateContentConfig(
-                        response_mime_type="application/json",
-                        temperature=0.2
-                    )
+    # 重試 4 次，遇到尖峰 503 自動拉長等待時間
+    max_retries = 4
+    for attempt in range(1, max_retries + 1):
+        try:
+            print(f"[AI Agent] 正在請求 Gemini 分析新聞 (第 {attempt}/{max_retries} 次)...")
+            response = client.models.generate_content(
+                model="gemini-3.6-flash",
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    temperature=0.2
                 )
-                if response and response.text:
-                    digest = json.loads(response.text)
-                    if isinstance(digest, list) and len(digest) > 0:
-                        print(f"[AI Agent] 成功使用 {model_name} 完成分析！")
-                        return digest
-            except Exception as e:
-                print(f"[AI Agent] 模型 {model_name} 呼叫失敗: {e}")
-                if "503" in str(e) or "429" in str(e) or "UNAVAILABLE" in str(e):
-                    wait_sec = attempt * 5
-                    print(f"[AI Agent] 遇到伺服器壅塞 (503/429)，等待 {wait_sec} 秒後重試...")
-                    time.sleep(wait_sec)
-                else:
-                    break
+            )
+            if response and response.text:
+                digest = json.loads(response.text)
+                if isinstance(digest, list) and len(digest) > 0:
+                    print(f"[AI Agent] 成功完成新聞精選與繁中摘要！")
+                    return digest
+        except Exception as e:
+            print(f"[AI Agent] 呼叫異常: {e}")
+            if attempt < max_retries:
+                wait_sec = attempt * 8  # 8s, 16s, 24s
+                print(f"[AI Agent] 等待 {wait_sec} 秒後進行重試...")
+                time.sleep(wait_sec)
 
-    # 兜底降級保險：萬一全部失敗，絕對不讓程式閃退，自動轉為精選備用格式
-    print("[AI Agent] 警告：所有 AI 模型皆暫時無法連線，啟用降級防禦模式...")
+    # 降級保險：確保系統永遠不中斷
+    print("[AI Agent] 警告：AI 模型重試後仍無法連線，啟用降級安全模式...")
     fallback_digest = []
     for a in articles[:top_k]:
         fallback_digest.append({
@@ -89,7 +85,7 @@ def summarize_financial_news(articles, top_k=4):
             "original_title": a["title"],
             "source": a["source"],
             "link": a["link"],
-            "importance": "即時國際重大新聞（AI 服務連線忙碌中，提供原文快訊）",
+            "importance": "即時國際重大新聞（AI 雲端連線忙碌中，提供原文快訊）",
             "key_points": [a.get("summary", "請點擊連結查看詳細報導。")[:100] + "..."]
         })
     return fallback_digest
