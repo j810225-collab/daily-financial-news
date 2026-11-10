@@ -1,19 +1,51 @@
 import os
 import json
 import time
+import random
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
 load_dotenv()
 
-# 候選模型依序嘗試，優先使用實測 200 OK 且秒速回應的 lite 系列，徹底避開 503 壅塞
-MODELS_TO_TRY = [
+# 劃分兩組完全不同底層架構的算力通道，避免「同群體同時 503」
+CLUSTER_LITE = [
     "gemini-3.5-flash-lite",
     "gemini-3.1-flash-lite",
-    "gemini-3.1-flash-lite-preview",
-    "gemini-3.8-flash"
+    "gemini-3.1-flash-lite-preview"
 ]
+
+CLUSTER_FLAGSHIP = [
+    "gemini-3.8-flash",
+    "gemini-3.7-flash",
+    "gemini-flash-latest"
+]
+
+def find_healthy_model(client):
+    """
+    健康預檢：發送微型探針，秒級找出目前最健康、不塞車的模型。
+    交叉檢查 Lite 與 Flagship 兩大算力通道。
+    """
+    all_candidates = CLUSTER_LITE + CLUSTER_FLAGSHIP
+    print("[AI Agent] 啟動模型健康預檢...")
+    for model_name in all_candidates:
+        try:
+            # 微型探針測試
+            res = client.models.generate_content(
+                model=model_name,
+                contents="ping",
+                config=types.GenerateContentConfig(
+                    max_output_tokens=5,
+                    temperature=0.1
+                )
+            )
+            if res and res.text:
+                print(f"[AI Agent] 預檢通過！當前最健康模型為: {model_name}")
+                return model_name
+        except Exception as e:
+            print(f"[AI Agent] 模型 {model_name} 暫時壅塞或不可用 ({e.__class__.__name__})，檢查下一模型...")
+            continue
+    return None
 
 def summarize_financial_news(articles, top_k=4):
     api_key = os.getenv("GEMINI_API_KEY")
@@ -21,6 +53,10 @@ def summarize_financial_news(articles, top_k=4):
         raise ValueError("GEMINI_API_KEY is not set in environment or .env file.")
 
     client = genai.Client(api_key=api_key)
+
+    # 執行隨機微幅抖動（Jitter 2~8 秒），避開與其他定時排程在精確同一秒打入 API
+    jitter_sec = random.uniform(2, 8)
+    time.sleep(jitter_sec)
 
     articles_input = []
     for idx, a in enumerate(articles, 1):
@@ -59,9 +95,21 @@ def summarize_financial_news(articles, top_k=4):
 {news_text}
 """
 
-    for model_name in MODELS_TO_TRY:
-        print(f"[AI Agent] 正在嘗試使用模型: {model_name} ...")
-        for attempt in range(1, 3):
+    # 第一輪：優先探測出的最佳健康模型
+    healthy_model = find_healthy_model(client)
+    prioritized_models = []
+    if healthy_model:
+        prioritized_models.append(healthy_model)
+    # 將其餘候選模型加入備援清單（去重）
+    for m in (CLUSTER_LITE + CLUSTER_FLAGSHIP):
+        if m not in prioritized_models:
+            prioritized_models.append(m)
+
+    # 深層指數退避重試循環
+    for model_name in prioritized_models:
+        print(f"[AI Agent] 正在嘗試使用模型處理新聞摘要: {model_name} ...")
+        # 針對單一模型給予最多 3 次帶退避的機會
+        for attempt in range(1, 4):
             try:
                 response = client.models.generate_content(
                     model=model_name,
@@ -77,12 +125,19 @@ def summarize_financial_news(articles, top_k=4):
                         print(f"[AI Agent] 成功使用 {model_name} 完成新聞精選與繁中摘要！")
                         return digest
             except Exception as e:
-                print(f"[AI Agent] {model_name} 呼叫遇到狀況 (第 {attempt} 次): {e}")
-                time.sleep(2)
-        print(f"[AI Agent] {model_name} 暫時無法使用，自動切換至下一個備援模型...")
+                err_str = str(e)
+                print(f"[AI Agent] {model_name} 執行異常 (第 {attempt} 次): {err_str[:120]}")
+                if "503" in err_str or "429" in err_str or "UNAVAILABLE" in err_str:
+                    wait_sec = (attempt * 6) + random.uniform(1, 4)
+                    print(f"[AI Agent] 遇到伺服器壅塞，等待 {wait_sec:.1f} 秒後進行指數退避重試...")
+                    time.sleep(wait_sec)
+                else:
+                    # 非壅塞錯誤（如格式問題），直接切換至下一模型
+                    break
+        print(f"[AI Agent] {model_name} 已達到重試上限，自動切換至下一備援模型...")
 
-    # 兜底降級保險
-    print("[AI Agent] 警告：所有 AI 模型皆暫時無法連線，啟用降級安全模式...")
+    # 兜底降級保險（萬一 Google 全球網路全面中斷）
+    print("[AI Agent] 警告：所有算力通道皆暫時無法連線，啟用降級安全模式...")
     fallback_digest = []
     for a in articles[:top_k]:
         fallback_digest.append({
@@ -90,7 +145,7 @@ def summarize_financial_news(articles, top_k=4):
             "original_title": a["title"],
             "source": a["source"],
             "link": a["link"],
-            "importance": "即時國際重大新聞（AI 雲端連線忙碌中，提供原文快訊）",
+            "importance": "即時國際重大新聞（Google 全球服務連線短暫維護中，提供原文快訊）",
             "key_points": [a.get("summary", "請點擊連結查看詳細報導。")[:100] + "..."]
         })
     return fallback_digest
