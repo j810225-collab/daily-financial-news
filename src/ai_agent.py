@@ -7,12 +7,12 @@ from google.genai import types
 
 load_dotenv()
 
-# 候選模型依序嘗試，確保任一模型遇到 503 時自動無縫切換
+# 候選模型依序嘗試，優先使用實測 200 OK 且秒速回應的 lite 系列，徹底避開 503 壅塞
 MODELS_TO_TRY = [
-    "gemini-flash-latest",
-    "gemini-3.8-flash",
-    "gemini-3.7-flash",
-    "gemini-flash-lite-latest"
+    "gemini-3.5-flash-lite",
+    "gemini-3.1-flash-lite",
+    "gemini-3.1-flash-lite-preview",
+    "gemini-3.8-flash"
 ]
 
 def summarize_financial_news(articles, top_k=4):
