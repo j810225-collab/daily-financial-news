@@ -8,20 +8,48 @@
         :root {
             --bg: #0d1117;
             --card-bg: #161b22;
+            --card-hover-border: #58a6ff66;
+            --card-shadow: none;
             --border: #30363d;
             --text-primary: #f0f6fc;
             --text-secondary: #8b949e;
+            --text-title: #ffffff;
             --accent: #58a6ff;
             --badge-bg: rgba(56, 139, 253, 0.15);
             --importance-bg: rgba(240, 136, 62, 0.1);
-            --importance-text: #f0883e;
+            --importance-border: #f0883e;
+            --importance-text: #e6edf3;
             --bullet-color: #3fb950;
+            --theme-btn-bg: #21262d;
+            --theme-btn-border: #363b42;
+            --theme-btn-text: #c9d1d9;
+        }
+
+        body.light-theme {
+            --bg: #f6f8fa;
+            --card-bg: #ffffff;
+            --card-hover-border: #0969da66;
+            --card-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+            --border: #d0d7de;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --text-title: #1f2328;
+            --accent: #0969da;
+            --badge-bg: rgba(9, 105, 218, 0.1);
+            --importance-bg: #fff8eb;
+            --importance-border: #bf8700;
+            --importance-text: #4d2d00;
+            --bullet-color: #1a7f37;
+            --theme-btn-bg: #ffffff;
+            --theme-btn-border: #d0d7de;
+            --theme-btn-text: #24292f;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
         }
 
         body {
@@ -35,6 +63,35 @@
         .container {
             max-width: 800px;
             margin: 0 auto;
+            position: relative;
+        }
+
+        /* 主題切換按鈕區 */
+        .top-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 12px;
+        }
+
+        .theme-toggle-btn {
+            background-color: var(--theme-btn-bg);
+            border: 1px solid var(--theme-btn-border);
+            color: var(--theme-btn-text);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            user-select: none;
+        }
+
+        .theme-toggle-btn:hover {
+            opacity: 0.85;
+            transform: scale(1.02);
         }
 
         header {
@@ -60,7 +117,7 @@
             font-size: 2rem;
             font-weight: 700;
             margin-bottom: 8px;
-            color: #ffffff;
+            color: var(--text-title);
         }
 
         .update-time {
@@ -78,13 +135,14 @@
             background-color: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 20px 24px;
-            transition: transform 0.2s ease, border-color 0.2s ease;
+            padding: 22px 26px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         .news-card:hover {
             transform: translateY(-2px);
-            border-color: #58a6ff66;
+            border-color: var(--card-hover-border);
         }
 
         .card-header {
@@ -111,7 +169,7 @@
             font-size: 1.25rem;
             font-weight: 700;
             margin-bottom: 6px;
-            color: #ffffff;
+            color: var(--text-title);
             line-height: 1.4;
         }
 
@@ -124,13 +182,14 @@
 
         .importance-box {
             background-color: var(--importance-bg);
-            border-left: 3px solid var(--importance-text);
-            color: #e6edf3;
-            padding: 8px 12px;
+            border-left: 3px solid var(--importance-border);
+            color: var(--importance-text);
+            padding: 10px 14px;
             border-radius: 4px;
-            font-size: 0.9rem;
+            font-size: 0.92rem;
             margin-bottom: 14px;
             font-weight: 500;
+            line-height: 1.5;
         }
 
         .key-points {
@@ -143,7 +202,7 @@
             padding-left: 20px;
             margin-bottom: 8px;
             font-size: 0.95rem;
-            color: #c9d1d9;
+            color: var(--text-primary);
         }
 
         .key-points li::before {
@@ -182,10 +241,18 @@
 </head>
 <body>
     <div class="container">
+        <!-- 主題切換按鈕 -->
+        <div class="top-toolbar">
+            <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()">
+                <span id="themeIcon">☀️</span>
+                <span id="themeText">切換為白底模式</span>
+            </button>
+        </div>
+
         <header>
             <div class="tagline">AI FINANCIAL INTELLIGENCE</div>
             <h1>全球每日財經焦點</h1>
-            <div class="update-time">最後更新時間：2026-11-16 06:32:58</div>
+            <div class="update-time">最後更新時間：2026-11-17 12:01:06</div>
         </header>
 
         <main class="news-list">
@@ -194,58 +261,56 @@
         <span class="source-tag">CNBC Finance</span>
         <span class="rank-num">#1</span>
     </div>
-    <h2 class="card-title">中國 10 月經濟數據全線遜於預期，內需疲軟深化放緩態勢</h2>
-    <div class="original-title">China’s slowdown deepens in October as industrial output, retail sales, investment miss estimates</div>
+    <h2 class="card-title">聯準會主席凱文·沃什警示人工智慧對經濟至關重要卻存在潛在失望風險</h2>
+    <div class="original-title">Fed Chairman Kevin Warsh stresses importance of AI to economy, but says it could ‘disappoint’</div>
     
     <div class="importance-box">
-        💡 <strong>市場洞察：</strong>凸顯中國國內動能持續消退，對全球原物料需求與外需依賴加深的風險正在擴大。
+        💡 <strong>市場洞察：</strong>此評論直接牽動全球資本市場對科技股估值與未來生產力成長的定價預期，對總體經濟與貨幣政策走向具備深遠影響。
     </div>
 
     <ul class="key-points">
-        <li>10月工業產出、零售銷售與固定資產投資全面低於市場預期。</li><li>國內經濟動能減弱，使中國經濟更易受到外部衝擊的影響。</li>
+        <li>聯準會領導層高度關注人工智慧（AI）技術對整體經濟結構與生產力的深遠影響。</li><li>官方公開警示AI發展可能面臨「不如預期」的風險，暗示市場應慎防過度樂觀的估值泡沫。</li>
     </ul>
 
-    <a href="https://www.cnbc.com/2026/11/16/china-retail-sales-october-industrial-output-investment.html" target="_blank" rel="noopener noreferrer" class="read-more">
+    <a href="https://www.cnbc.com/2026/11/16/fed-ai-task-force-kevin-warsh.html" target="_blank" rel="noopener noreferrer" class="read-more">
         閱讀完整原文 ↗
     </a>
-</article>
-<article class="news-card">
+</article>\n<article class="news-card">
     <div class="card-header">
         <span class="source-tag">CNBC Finance</span>
         <span class="rank-num">#2</span>
     </div>
-    <h2 class="card-title">輝達領導層變動與政治格局轉變，恐重塑全球 AI 投資版圖</h2>
-    <div class="original-title">How Nvidia turmoil and a Democratic Congress could reshape the AI trade, according to ETF experts</div>
+    <h2 class="card-title">中東出口恢復與第四季供應過剩預期，推動美國原油價格跌至每桶 85 美元</h2>
+    <div class="original-title">U.S. crude oil declines to $85 a barrel on recovering Middle East exports</div>
     
     <div class="importance-box">
-        💡 <strong>市場洞察：</strong>這可能改變市場資金高度集中於輝達的現狀，將 AI 投資需求引導至其他大型科技股與競爭晶片製造商。
+        💡 <strong>市場洞察：</strong>油價回落有助於減輕全球通膨壓力，並直接影響能源產業獲利預期及各國央行後續的利率決策路徑。
     </div>
 
     <ul class="key-points">
-        <li>輝達高層動盪與國會政治權力結構的轉變，成為影響 AI 概念股走勢的新變數。</li><li>ETF 專家認為資金可能從單一巨頭分散，利好其他科技巨頭與同業晶片商。</li>
+        <li>中東地區原油出口逐步恢復，舒緩了先前市場對地緣政治供應中斷的擔憂。</li><li>最新預測顯示第四季原油市場將出現供過於求的局面，成為壓抑油價走跌的核心基本面因素。</li>
     </ul>
 
-    <a href="https://www.cnbc.com/2026/11/14/nvidia-ai-trade-data-centers-congress.html" target="_blank" rel="noopener noreferrer" class="read-more">
+    <a href="https://www.cnbc.com/2026/11/16/us-crude-oil-declines-to-87-a-barrel-on-recovering-middle-east-exports.html" target="_blank" rel="noopener noreferrer" class="read-more">
         閱讀完整原文 ↗
     </a>
-</article>
-<article class="news-card">
+</article>\n<article class="news-card">
     <div class="card-header">
         <span class="source-tag">CNBC Finance</span>
         <span class="rank-num">#3</span>
     </div>
-    <h2 class="card-title">輝達執行長黃仁勳辭職引發政治審查，商務部長盧特尼克家族利益受關注</h2>
-    <div class="original-title">Lutnick faces questions over Nvidia spy scandal. His sons' firm has ties to the chipmaker</div>
+    <h2 class="card-title">巴菲特旗下波克夏海瑟威第三季增持達美航空並持續精簡大型銀行持股</h2>
+    <div class="original-title">Berkshire Hathaway raised its stake in Delta in the third quarter. It also trimmed a key bank holding</div>
     
     <div class="importance-box">
-        💡 <strong>市場洞察：</strong>高層去職與地緣政治審查交織，為半導體產業的監管風險與美中科技競合帶來新變數。
+        💡 <strong>市場洞察：</strong>「股神」巴菲特的資產配置調控向來是全球機構法人與散戶資金風向球，其對航空業與大型銀行股的最新布局揭示了聰明錢的產業防禦與輪動邏輯。
     </div>
 
     <ul class="key-points">
-        <li>黃仁勳辭去輝達執行長職務，引發市場對相關間諜醜聞與政策監管的強烈關注。</li><li>美國商務部長霍華德·盧特尼克（Howard Lutnick）及其家族企業與輝達的財務連結遭到嚴格審視。</li>
+        <li>波克夏海瑟威在第三季選擇加碼特定股票部位，其中包括增加對達美航空的持股。</li><li>同步進行投資組合優化，精簡了包括美國銀行（Bank of America）在內的重要銀行股部位。</li>
     </ul>
 
-    <a href="https://www.cnbc.com/2026/11/13/howard-lutnick-nvidia-jensen-huang-china-cantor-fitzgerald.html" target="_blank" rel="noopener noreferrer" class="read-more">
+    <a href="https://www.cnbc.com/2026/11/16/berkshire-hathaway-raised-its-stake-in-delta-air-in-the-third-quarter.html" target="_blank" rel="noopener noreferrer" class="read-more">
         閱讀完整原文 ↗
     </a>
 </article>
@@ -255,5 +320,41 @@
             <p>由 Gemini AI 自動篩選與摘要 • 每日定時更新</p>
         </footer>
     </div>
+
+    <!-- 主題切換與自動記憶腳本 -->
+    <script>
+        function applyTheme(theme) {
+            const body = document.body;
+            const icon = document.getElementById("themeIcon");
+            const text = document.getElementById("themeText");
+            if (theme === "light") {
+                body.classList.add("light-theme");
+                if (icon) icon.textContent = "🌙";
+                if (text) text.textContent = "切換為黑底模式";
+            } else {
+                body.classList.remove("light-theme");
+                if (icon) icon.textContent = "☀️";
+                if (text) text.textContent = "切換為白底模式";
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.body.classList.contains("light-theme") ? "dark" : "light";
+            localStorage.setItem("user-theme-preference", currentTheme);
+            applyTheme(currentTheme);
+        }
+
+        // 初始化時優先讀取使用者記憶中的偏好
+        (function initTheme() {
+            const savedTheme = localStorage.getItem("user-theme-preference");
+            if (savedTheme) {
+                applyTheme(savedTheme);
+            } else {
+                // 如果使用者系統預設偏好淺色，自動貼合
+                const prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+                applyTheme(prefersLight ? "light" : "dark");
+            }
+        })();
+    </script>
 </body>
 </html>

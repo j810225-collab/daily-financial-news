@@ -11,20 +11,48 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         :root {
             --bg: #0d1117;
             --card-bg: #161b22;
+            --card-hover-border: #58a6ff66;
+            --card-shadow: none;
             --border: #30363d;
             --text-primary: #f0f6fc;
             --text-secondary: #8b949e;
+            --text-title: #ffffff;
             --accent: #58a6ff;
             --badge-bg: rgba(56, 139, 253, 0.15);
             --importance-bg: rgba(240, 136, 62, 0.1);
-            --importance-text: #f0883e;
+            --importance-border: #f0883e;
+            --importance-text: #e6edf3;
             --bullet-color: #3fb950;
+            --theme-btn-bg: #21262d;
+            --theme-btn-border: #363b42;
+            --theme-btn-text: #c9d1d9;
+        }
+
+        body.light-theme {
+            --bg: #f6f8fa;
+            --card-bg: #ffffff;
+            --card-hover-border: #0969da66;
+            --card-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+            --border: #d0d7de;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --text-title: #1f2328;
+            --accent: #0969da;
+            --badge-bg: rgba(9, 105, 218, 0.1);
+            --importance-bg: #fff8eb;
+            --importance-border: #bf8700;
+            --importance-text: #4d2d00;
+            --bullet-color: #1a7f37;
+            --theme-btn-bg: #ffffff;
+            --theme-btn-border: #d0d7de;
+            --theme-btn-text: #24292f;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
         }
 
         body {
@@ -38,6 +66,35 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         .container {
             max-width: 800px;
             margin: 0 auto;
+            position: relative;
+        }
+
+        /* 主題切換按鈕區 */
+        .top-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 12px;
+        }
+
+        .theme-toggle-btn {
+            background-color: var(--theme-btn-bg);
+            border: 1px solid var(--theme-btn-border);
+            color: var(--theme-btn-text);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            user-select: none;
+        }
+
+        .theme-toggle-btn:hover {
+            opacity: 0.85;
+            transform: scale(1.02);
         }
 
         header {
@@ -63,7 +120,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             font-size: 2rem;
             font-weight: 700;
             margin-bottom: 8px;
-            color: #ffffff;
+            color: var(--text-title);
         }
 
         .update-time {
@@ -81,13 +138,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             background-color: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 20px 24px;
-            transition: transform 0.2s ease, border-color 0.2s ease;
+            padding: 22px 26px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         .news-card:hover {
             transform: translateY(-2px);
-            border-color: #58a6ff66;
+            border-color: var(--card-hover-border);
         }
 
         .card-header {
@@ -114,7 +172,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             font-size: 1.25rem;
             font-weight: 700;
             margin-bottom: 6px;
-            color: #ffffff;
+            color: var(--text-title);
             line-height: 1.4;
         }
 
@@ -127,13 +185,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
         .importance-box {
             background-color: var(--importance-bg);
-            border-left: 3px solid var(--importance-text);
-            color: #e6edf3;
-            padding: 8px 12px;
+            border-left: 3px solid var(--importance-border);
+            color: var(--importance-text);
+            padding: 10px 14px;
             border-radius: 4px;
-            font-size: 0.9rem;
+            font-size: 0.92rem;
             margin-bottom: 14px;
             font-weight: 500;
+            line-height: 1.5;
         }
 
         .key-points {
@@ -146,7 +205,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             padding-left: 20px;
             margin-bottom: 8px;
             font-size: 0.95rem;
-            color: #c9d1d9;
+            color: var(--text-primary);
         }
 
         .key-points li::before {
@@ -185,6 +244,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </head>
 <body>
     <div class="container">
+        <!-- 主題切換按鈕 -->
+        <div class="top-toolbar">
+            <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()">
+                <span id="themeIcon">☀️</span>
+                <span id="themeText">切換為白底模式</span>
+            </button>
+        </div>
+
         <header>
             <div class="tagline">AI FINANCIAL INTELLIGENCE</div>
             <h1>全球每日財經焦點</h1>
@@ -199,6 +266,42 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             <p>由 Gemini AI 自動篩選與摘要 • 每日定時更新</p>
         </footer>
     </div>
+
+    <!-- 主題切換與自動記憶腳本 -->
+    <script>
+        function applyTheme(theme) {
+            const body = document.body;
+            const icon = document.getElementById("themeIcon");
+            const text = document.getElementById("themeText");
+            if (theme === "light") {
+                body.classList.add("light-theme");
+                if (icon) icon.textContent = "🌙";
+                if (text) text.textContent = "切換為黑底模式";
+            } else {
+                body.classList.remove("light-theme");
+                if (icon) icon.textContent = "☀️";
+                if (text) text.textContent = "切換為白底模式";
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.body.classList.contains("light-theme") ? "dark" : "light";
+            localStorage.setItem("user-theme-preference", currentTheme);
+            applyTheme(currentTheme);
+        }
+
+        // 初始化時優先讀取使用者記憶中的偏好
+        (function initTheme() {
+            const savedTheme = localStorage.getItem("user-theme-preference");
+            if (savedTheme) {
+                applyTheme(savedTheme);
+            } else {
+                // 如果使用者系統預設偏好淺色，自動貼合
+                const prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+                applyTheme(prefersLight ? "light" : "dark");
+            }
+        })();
+    </script>
 </body>
 </html>
 """
@@ -237,7 +340,7 @@ def generate_html(digest_list, output_file="index.html"):
 </article>"""
         cards.append(card)
 
-    full_html = HTML_TEMPLATE.replace("__UPDATE_TIME__", now_str).replace("__CARDS_HTML__", "\n".join(cards))
+    full_html = HTML_TEMPLATE.replace("__UPDATE_TIME__", now_str).replace("__CARDS_HTML__", "\\n".join(cards))
 
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(full_html)
