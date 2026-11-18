@@ -6,13 +6,29 @@ load_dotenv()
 
 GITHUB_PAGES_URL = "https://j810225-collab.github.io/daily-financial-news/"
 
-def format_news_for_line(digest_list):
+def format_news_for_line(digest_data):
+    if isinstance(digest_data, dict):
+        overview = digest_data.get("market_overview", "")
+        topics = digest_data.get("trending_topics", [])
+        articles = digest_data.get("articles", [])
+    else:
+        overview = ""
+        topics = []
+        articles = digest_data if isinstance(digest_data, list) else []
+
     lines = [
         "📊 【全球財經焦點速報】(每 3 日精選)",
         "─────────────────"
     ]
 
-    for i, item in enumerate(digest_list, 1):
+    if overview:
+        lines.append(f"⚡ 宏觀局勢：{overview}")
+        if topics:
+            pills = " ".join([f"#{t.lstrip('#')}" for t in topics])
+            lines.append(f"🏷️ 關鍵主題：{pills}")
+        lines.append("─────────────────")
+
+    for i, item in enumerate(articles, 1):
         lines.append(f"🔥 [{i}] {item.get('title_tw', '')}")
         lines.append(f"💡 觀點：{item.get('importance', '')}")
         
@@ -24,14 +40,12 @@ def format_news_for_line(digest_list):
         lines.append("")
 
     lines.append("─────────────────")
-    lines.append(f"🌐 完整網頁版：{GITHUB_PAGES_URL}")
-    lines.append("🤖 由 Gemini AI 自動彙整")
+    lines.append(f"🌐 完整響應式網頁版：{GITHUB_PAGES_URL}")
+    lines.append("🤖 由 Gemini AI 自動深度洞察")
     return "\n".join(lines).strip()
 
 def send_line_push(message_text):
     token = os.getenv("LINE_CHANNEL_ACCESS_TOKEN")
-    
-    # 優先只推播給群組，避免重複發個人浪費每月 200 則的額度
     target_id = os.getenv("LINE_GROUP_ID") or os.getenv("LINE_USER_ID")
 
     if not token or not target_id:

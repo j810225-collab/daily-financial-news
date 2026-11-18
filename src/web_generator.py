@@ -5,14 +5,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>全球每日財經焦點 | Global Financial Digest</title>
     <style>
         :root {
             --bg: #0d1117;
             --card-bg: #161b22;
             --card-hover-border: #58a6ff66;
-            --card-shadow: none;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
             --border: #30363d;
             --text-primary: #f0f6fc;
             --text-secondary: #8b949e;
@@ -26,13 +26,18 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             --theme-btn-bg: #21262d;
             --theme-btn-border: #363b42;
             --theme-btn-text: #c9d1d9;
+            --pulse-bg: linear-gradient(135deg, rgba(88, 166, 255, 0.08) 0%, rgba(139, 148, 158, 0.04) 100%);
+            --pulse-border: #30363d;
+            --pill-bg: #21262d;
+            --pill-text: #58a6ff;
+            --pill-border: #30363d;
         }
 
         body.light-theme {
             --bg: #f6f8fa;
             --card-bg: #ffffff;
             --card-hover-border: #0969da66;
-            --card-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+            --card-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
             --border: #d0d7de;
             --text-primary: #24292f;
             --text-secondary: #57606a;
@@ -46,6 +51,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             --theme-btn-bg: #ffffff;
             --theme-btn-border: #d0d7de;
             --theme-btn-text: #24292f;
+            --pulse-bg: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);
+            --pulse-border: #d0d7de;
+            --pill-bg: #f0f4f9;
+            --pill-text: #0969da;
+            --pill-border: #d0d7de;
         }
 
         * {
@@ -60,20 +70,32 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             background-color: var(--bg);
             color: var(--text-primary);
             line-height: 1.6;
-            padding: 24px 16px;
+            padding: clamp(16px, 4vw, 36px) clamp(12px, 3vw, 24px);
+            -webkit-font-smoothing: antialiased;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 820px;
             margin: 0 auto;
-            position: relative;
         }
 
-        /* 主題切換按鈕區 */
+        /* 頂部導航列 */
         .top-toolbar {
             display: flex;
-            justify-content: flex-end;
-            margin-bottom: 12px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .brand-badge {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            color: var(--accent);
+            background: var(--badge-bg);
+            padding: 4px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
         }
 
         .theme-toggle-btn {
@@ -90,6 +112,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             gap: 6px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.06);
             user-select: none;
+            min-height: 38px;
         }
 
         .theme-toggle-btn:hover {
@@ -97,48 +120,106 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             transform: scale(1.02);
         }
 
+        /* 標頭區 */
         header {
             text-align: center;
-            margin-bottom: 32px;
-            padding-bottom: 24px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .tagline {
-            display: inline-block;
-            background: var(--badge-bg);
-            color: var(--accent);
-            font-size: 0.85rem;
-            font-weight: 600;
-            padding: 4px 12px;
-            border-radius: 20px;
-            margin-bottom: 12px;
-            letter-spacing: 0.5px;
+            margin-bottom: 24px;
         }
 
         h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 8px;
+            font-size: clamp(1.6rem, 5vw, 2.2rem);
+            font-weight: 800;
+            margin-bottom: 6px;
             color: var(--text-title);
+            letter-spacing: -0.5px;
         }
 
         .update-time {
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 0.88rem;
         }
 
+        /* 今日情報速讀儀表盒 (Executive Summary) */
+        .market-pulse-card {
+            background: var(--pulse-bg);
+            border: 1px solid var(--pulse-border);
+            border-radius: 14px;
+            padding: clamp(16px, 3vw, 22px);
+            margin-bottom: 28px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .pulse-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .pulse-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .pulse-stat {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background: var(--card-bg);
+            padding: 3px 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .pulse-overview {
+            font-size: clamp(0.95rem, 2.5vw, 1.05rem);
+            line-height: 1.6;
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-bottom: 14px;
+        }
+
+        .topics-wrapper {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .topic-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .topic-pill {
+            display: inline-block;
+            background-color: var(--pill-bg);
+            color: var(--pill-text);
+            border: 1px solid var(--pill-border);
+            padding: 3px 10px;
+            border-radius: 14px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        /* 新聞卡片列表 */
         .news-list {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 22px;
         }
 
         .news-card {
             background-color: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 22px 26px;
+            border-radius: 14px;
+            padding: clamp(18px, 4vw, 26px);
             box-shadow: var(--card-shadow);
             transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
         }
@@ -156,36 +237,39 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         }
 
         .source-tag {
-            font-size: 0.8rem;
+            font-size: 0.82rem;
             color: var(--accent);
-            font-weight: 600;
-            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.3px;
         }
 
-        .rank-num {
-            font-size: 0.85rem;
+        .rank-badge {
+            font-size: 0.8rem;
+            font-weight: 800;
             color: var(--text-secondary);
-            font-weight: bold;
+            background: rgba(139, 148, 158, 0.12);
+            padding: 2px 8px;
+            border-radius: 8px;
         }
 
         .card-title {
-            font-size: 1.25rem;
+            font-size: clamp(1.15rem, 3vw, 1.35rem);
             font-weight: 700;
             margin-bottom: 6px;
             color: var(--text-title);
-            line-height: 1.4;
+            line-height: 1.45;
         }
 
         .original-title {
             font-size: 0.85rem;
             color: var(--text-secondary);
-            font-style: italic;
             margin-bottom: 14px;
+            word-break: break-word;
         }
 
         .importance-box {
             background-color: var(--importance-bg);
-            border-left: 3px solid var(--importance-border);
+            border-left: 3.5px solid var(--importance-border);
             color: var(--importance-text);
             padding: 10px 14px;
             border-radius: 4px;
@@ -206,6 +290,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             margin-bottom: 8px;
             font-size: 0.95rem;
             color: var(--text-primary);
+            line-height: 1.55;
         }
 
         .key-points li::before {
@@ -218,34 +303,67 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             line-height: 1;
         }
 
-        .read-more {
+        .card-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        .read-more-btn {
             display: inline-flex;
             align-items: center;
             gap: 6px;
             color: var(--accent);
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: var(--badge-bg);
+            transition: background 0.2s ease, transform 0.2s ease;
         }
 
-        .read-more:hover {
-            text-decoration: underline;
+        .read-more-btn:hover {
+            opacity: 0.85;
+            transform: translateX(2px);
         }
 
         footer {
             text-align: center;
             margin-top: 40px;
-            padding-top: 20px;
+            padding-top: 24px;
             border-top: 1px solid var(--border);
             color: var(--text-secondary);
             font-size: 0.85rem;
+        }
+
+        /* 針對小螢幕 (< 480px) 極致緊湊優化 */
+        @media (max-width: 480px) {
+            .pulse-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .news-card {
+                padding: 16px;
+            }
+            .card-title {
+                font-size: 1.12rem;
+            }
+            .importance-box {
+                font-size: 0.88rem;
+                padding: 8px 12px;
+            }
+            .key-points li {
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 主題切換按鈕 -->
+        <!-- 頂部導航列 -->
         <div class="top-toolbar">
+            <div class="brand-badge">Global Financial Intel</div>
             <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()">
                 <span id="themeIcon">☀️</span>
                 <span id="themeText">切換為白底模式</span>
@@ -253,21 +371,33 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         </div>
 
         <header>
-            <div class="tagline">AI FINANCIAL INTELLIGENCE</div>
             <h1>全球每日財經焦點</h1>
             <div class="update-time">最後更新時間：__UPDATE_TIME__</div>
         </header>
 
+        <!-- 今日情報速讀儀表盒 (Executive Summary) -->
+        <section class="market-pulse-card">
+            <div class="pulse-header">
+                <div class="pulse-title">⚡ 今日全球宏觀脈動 (Market Pulse)</div>
+                <div class="pulse-stat">今日精選 __ARTICLE_COUNT__ 則重大頭條</div>
+            </div>
+            <p class="pulse-overview">__MARKET_OVERVIEW__</p>
+            <div class="topics-wrapper">
+                <span class="topic-label">關鍵主題：</span>
+                __TOPIC_PILLS__
+            </div>
+        </section>
+
+        <!-- 新聞清單 -->
         <main class="news-list">
             __CARDS_HTML__
         </main>
 
         <footer>
-            <p>由 Gemini AI 自動篩選與摘要 • 每日定時更新</p>
+            <p>由 Gemini AI 自動篩選與深度繁中洞察 • 每日定時更新</p>
         </footer>
     </div>
 
-    <!-- 主題切換與自動記憶腳本 -->
     <script>
         function applyTheme(theme) {
             const body = document.body;
@@ -290,13 +420,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             applyTheme(currentTheme);
         }
 
-        // 初始化時優先讀取使用者記憶中的偏好
         (function initTheme() {
             const savedTheme = localStorage.getItem("user-theme-preference");
             if (savedTheme) {
                 applyTheme(savedTheme);
             } else {
-                // 如果使用者系統預設偏好淺色，自動貼合
                 const prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
                 applyTheme(prefersLight ? "light" : "dark");
             }
@@ -306,11 +434,24 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </html>
 """
 
-def generate_html(digest_list, output_file="index.html"):
+def generate_html(digest_data, output_file="index.html"):
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    cards = []
 
-    for rank, item in enumerate(digest_list, 1):
+    # 兼容舊版 list 或新版 dict 結構
+    if isinstance(digest_data, dict):
+        market_overview = digest_data.get("market_overview", "今日全球財經焦點速覽，即時掌握關鍵脈動。")
+        topics = digest_data.get("trending_topics", ["全球市場", "總體經濟", "產業分析"])
+        articles = digest_data.get("articles", [])
+    else:
+        market_overview = "今日全球財經焦點速覽，即時掌握關鍵脈動。"
+        topics = ["全球市場", "總體經濟", "產業分析"]
+        articles = digest_data if isinstance(digest_data, list) else []
+
+    # 產生主題膠囊標籤 HTML
+    topic_pills_html = "".join([f'<span class="topic-pill">#{t.lstrip("#")}</span>' for t in topics])
+
+    cards = []
+    for rank, item in enumerate(articles, 1):
         points_html = "".join([f"<li>{p}</li>" for p in item.get("key_points", [])])
         source = item.get("source", "國際財經")
         title_tw = item.get("title_tw", "")
@@ -321,7 +462,7 @@ def generate_html(digest_list, output_file="index.html"):
         card = f"""<article class="news-card">
     <div class="card-header">
         <span class="source-tag">{source}</span>
-        <span class="rank-num">#{rank}</span>
+        <span class="rank-badge">#{rank}</span>
     </div>
     <h2 class="card-title">{title_tw}</h2>
     <div class="original-title">{original_title}</div>
@@ -334,13 +475,22 @@ def generate_html(digest_list, output_file="index.html"):
         {points_html}
     </ul>
 
-    <a href="{link}" target="_blank" rel="noopener noreferrer" class="read-more">
-        閱讀完整原文 ↗
-    </a>
+    <div class="card-footer">
+        <a href="{link}" target="_blank" rel="noopener noreferrer" class="read-more-btn">
+            閱讀完整外媒原文 ↗
+        </a>
+    </div>
 </article>"""
         cards.append(card)
 
-    full_html = HTML_TEMPLATE.replace("__UPDATE_TIME__", now_str).replace("__CARDS_HTML__", "\\n".join(cards))
+    full_html = (
+        HTML_TEMPLATE
+        .replace("__UPDATE_TIME__", now_str)
+        .replace("__ARTICLE_COUNT__", str(len(articles)))
+        .replace("__MARKET_OVERVIEW__", market_overview)
+        .replace("__TOPIC_PILLS__", topic_pills_html)
+        .replace("__CARDS_HTML__", "\\n".join(cards))
+    )
 
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(full_html)
