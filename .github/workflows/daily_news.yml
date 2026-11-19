@@ -2,8 +2,10 @@ name: Daily Financial News AI Agent
 
 on:
   schedule:
-    # 每天台灣時間 08:17 (UTC 00:17) 自動執行更新網站
+    # 主排程：每天台灣時間 08:17 (UTC 00:17) 自動執行
     - cron: '17 0 * * *'
+    # 備援排程：每天台灣時間 09:42 (UTC 01:42) 補跑（防止 GitHub 尖峰丟包）
+    - cron: '42 1 * * *'
   workflow_dispatch:
     inputs:
       send_line:
@@ -46,7 +48,6 @@ jobs:
       - name: 判斷今日是否為每 3 天的 LINE 推播日
         id: line_check
         run: |
-          # 如果是手動觸發 (workflow_dispatch)，依使用者選擇
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             if [ "${{ inputs.send_line }}" = "true" ]; then
               echo "should_send=true" >> $GITHUB_OUTPUT
@@ -54,8 +55,6 @@ jobs:
               echo "should_send=false" >> $GITHUB_OUTPUT
             fi
           else
-            # 定時排程 (每天執行): 檢查今天日期 (Day of Month)
-            # 每 3 天一次 (例如 1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31 號)
             DAY=$(date +%-d)
             if [ $(( DAY % 3 )) -eq 1 ]; then
               echo "今日 ($DAY 號) 符合每 3 日推播週期，啟動 LINE 發布！"
@@ -81,7 +80,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update daily financial digest [skip ci]" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update daily financial digest $(date +'%Y-%m-%d %H:%M')" && git push)
 
       - name: 設定 GitHub Pages
         uses: actions/configure-pages@v4
