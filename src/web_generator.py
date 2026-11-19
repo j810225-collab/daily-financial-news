@@ -257,7 +257,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             border-radius: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .card-header {
@@ -497,7 +497,6 @@ def generate_html(digest_data, output_file="index.html"):
         importance = item.get("importance", "")
         link = item.get("link", "#")
 
-        # 建議 1：第 1 則頭條賦予 Hero Card 樣式與頭條徽章
         is_hero = (rank == 1)
         hero_class = "hero-card" if is_hero else ""
         hero_badge_html = '<div class="hero-banner">★ 今日焦點頭條 (Top Story)</div>' if is_hero else ""
@@ -527,13 +526,16 @@ def generate_html(digest_data, output_file="index.html"):
 </article>"""
         cards.append(card)
 
+    # 真正換行，去除多餘反斜線字面量 \n
+    cards_joined = "\n".join(cards)
+
     full_html = (
         HTML_TEMPLATE
         .replace("__UPDATE_TIME__", now_str)
         .replace("__ARTICLE_COUNT__", str(len(articles)))
         .replace("__MARKET_OVERVIEW__", market_overview)
         .replace("__TOPIC_PILLS__", topic_pills_html)
-        .replace("__CARDS_HTML__", "\\n".join(cards))
+        .replace("__CARDS_HTML__", cards_joined)
     )
 
     with open(output_file, "w", encoding="utf-8") as f:
