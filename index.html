@@ -28,6 +28,10 @@
             --pill-bg: #21262d;
             --pill-text: #58a6ff;
             --pill-border: #30363d;
+            --hero-border: #58a6ff;
+            --hero-bg: linear-gradient(180deg, rgba(88, 166, 255, 0.06) 0%, #161b22 100%);
+            --hero-badge-bg: linear-gradient(135deg, #e3b341 0%, #d29922 100%);
+            --hero-badge-text: #000000;
         }
 
         body.light-theme {
@@ -53,6 +57,10 @@
             --pill-bg: #f0f4f9;
             --pill-text: #0969da;
             --pill-border: #d0d7de;
+            --hero-border: #0969da;
+            --hero-bg: linear-gradient(180deg, #f6faff 0%, #ffffff 100%);
+            --hero-badge-bg: linear-gradient(135deg, #d29922 0%, #9a6700 100%);
+            --hero-badge-text: #ffffff;
         }
 
         * {
@@ -226,6 +234,29 @@
             border-color: var(--card-hover-border);
         }
 
+        /* 建議 1：第 1 則頭條突出 Hero Card */
+        .news-card.hero-card {
+            background: var(--hero-bg);
+            border: 2px solid var(--hero-border);
+            box-shadow: 0 6px 24px rgba(88, 166, 255, 0.15);
+            position: relative;
+        }
+
+        .hero-banner {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--hero-badge-bg);
+            color: var(--hero-badge-text);
+            font-size: 0.76rem;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
         .card-header {
             display: flex;
             justify-content: space-between;
@@ -255,6 +286,13 @@
             margin-bottom: 6px;
             color: var(--text-title);
             line-height: 1.45;
+        }
+
+        /* 頭條標題特別放大突出 */
+        .hero-card .card-title {
+            font-size: clamp(1.3rem, 3.8vw, 1.55rem);
+            font-weight: 800;
+            line-height: 1.4;
         }
 
         .original-title {
@@ -334,7 +372,6 @@
             font-size: 0.85rem;
         }
 
-        /* 針對小螢幕 (< 480px) 極致緊湊優化 */
         @media (max-width: 480px) {
             .pulse-header {
                 flex-direction: column;
@@ -345,6 +382,9 @@
             }
             .card-title {
                 font-size: 1.12rem;
+            }
+            .hero-card .card-title {
+                font-size: 1.25rem;
             }
             .importance-box {
                 font-size: 0.88rem;
@@ -369,7 +409,7 @@
 
         <header>
             <h1>全球每日財經焦點</h1>
-            <div class="update-time">最後更新時間：2026-11-19 14:07:29</div>
+            <div class="update-time">最後更新時間：2026-11-19 14:19:26</div>
         </header>
 
         <!-- 今日情報速讀儀表盒 (Executive Summary) -->
@@ -378,29 +418,30 @@
                 <div class="pulse-title">⚡ 今日全球宏觀脈動 (Market Pulse)</div>
                 <div class="pulse-stat">今日精選 3 則重大頭條</div>
             </div>
-            <p class="pulse-overview">聯準會官員透露不排除擴大升息以對抗通膨，疊加川習普歷史性會面帶動地緣政治變局，全球市場正同時面臨貨幣緊縮與大國博弈的雙重壓力測試。</p>
+            <p class="pulse-overview">通膨黏著度居高不下與聯準會鷹派言論持續牽動全球資本市場神經，加上美中俄三方領袖峰會的地緣政治變數，投資人正高度警惕貨幣政策轉向與供應鏈韌性帶來的雙重衝擊。</p>
             <div class="topics-wrapper">
                 <span class="topic-label">關鍵主題：</span>
-                <span class="topic-pill">#聯準會利率政策</span><span class="topic-pill">#通膨預期</span><span class="topic-pill">#地緣政治峰會</span><span class="topic-pill">#貨幣緊縮</span>
+                <span class="topic-pill">#聯準會利率政策</span><span class="topic-pill">#全球通膨預期</span><span class="topic-pill">#地緣政治峰會</span><span class="topic-pill">#零售與消費動能</span>
             </div>
         </section>
 
         <!-- 新聞清單 -->
         <main class="news-list">
-            <article class="news-card">
+            <article class="news-card hero-card">
+    <div class="hero-banner">★ 今日焦點頭條 (Top Story)</div>
     <div class="card-header">
         <span class="source-tag">CNBC Finance</span>
         <span class="rank-badge">#1</span>
     </div>
-    <h2 class="card-title">聯準會會議紀錄顯示官員預期進一步升息，並擔憂AI對通膨的潛在影響</h2>
+    <h2 class="card-title">聯準會暗示可能需要升息，並憂心人工智慧對通膨的潛在影響</h2>
     <div class="original-title">Fed officials expect more rate hikes, worry about AI impact on inflation, minutes show</div>
     
     <div class="importance-box">
-        💡 <strong>市場洞察：</strong>直接揭示央行對未來利率路徑的分歧與對新興技術通膨效應的擔憂，為全球資本市場定調緊縮預期。
+        💡 <strong>市場洞察：</strong>揭示了美國貨幣決策者對未來通膨走勢的新擔憂，特別是新興科技對經濟結構的影響，直接牽動全球資產訂價與利率走向。
     </div>
 
     <ul class="key-points">
-        <li>聯準會公布10月政策會議紀錄，基準利率維持在3.75%-4%區間。</li><li>部分官員預期未來需要更多升息行動，並特別關注人工智慧發展對通膨帶來的潛在衝擊。</li>
+        <li>聯準會公布會議紀錄顯示官員預期未來可能需要進一步升息。</li><li>官員開始關注人工智慧（AI）技術對通膨結構可能帶來的影響與衝擊。</li>
     </ul>
 
     <div class="card-footer">
@@ -408,20 +449,21 @@
             閱讀完整外媒原文 ↗
         </a>
     </div>
-</article>\n<article class="news-card">
+</article>\n<article class="news-card ">
+    
     <div class="card-header">
         <span class="source-tag">CNBC Finance</span>
         <span class="rank-badge">#2</span>
     </div>
-    <h2 class="card-title">川普、習近平與普丁齊聚中國：解析大國峰會的關鍵地緣政治意涵</h2>
+    <h2 class="card-title">川普、習近平與普丁齊聚中國：解析峰會的關鍵地緣政治意涵</h2>
     <div class="original-title">I watched Trump, Xi and Putin gather in China. Here are my top takeaways</div>
     
     <div class="importance-box">
-        💡 <strong>市場洞察：</strong>美中俄三大巨頭罕見同台互動，將重塑全球供應鏈、國際貿易與地緣政治風險溢酬。
+        💡 <strong>市場洞察：</strong>超級強權領袖的罕見三方會晤，深刻影響全球地緣政治格局、國際貿易預期及跨國企業的戰略布局。
     </div>
 
     <ul class="key-points">
-        <li>美國總統川普、中國國家主席習近平與俄羅斯總統普丁預計於週四舉行罕見的三方會談。</li><li>此一高層級互動對全球地緣政治格局與大國經貿戰略具有深遠的示範與實質影響。</li>
+        <li>美國總統川普、中國國家主席習近平與俄羅斯總統普丁預計將舉行罕見的三方會談。</li><li>市場正密切關注會談結果對全球供應鏈及大國外交關係的實質影響。</li>
     </ul>
 
     <div class="card-footer">
@@ -429,20 +471,21 @@
             閱讀完整外媒原文 ↗
         </a>
     </div>
-</article>\n<article class="news-card">
+</article>\n<article class="news-card ">
+    
     <div class="card-header">
         <span class="source-tag">CNBC Finance</span>
         <span class="rank-badge">#3</span>
     </div>
-    <h2 class="card-title">聯準會華勒警告：央行可能需要透過「震撼市場」的兩碼升息來壓制通膨</h2>
+    <h2 class="card-title">聯準會理事華勒警告：央行可能需要以升息兩碼來「震撼市場」</h2>
     <div class="original-title">Fed’s Waller says central bank may need to ‘shock people’ with half-point rate hike</div>
     
     <div class="importance-box">
-        💡 <strong>市場洞察：</strong>鷹派官員的強硬表態大幅提高金融市場對激進貨幣政策的戒心，直接衝擊風險資產估值。
+        💡 <strong>市場洞察：</strong>高階官員釋出更為激進的鷹派訊號，直接挑戰市場原先的降息幻想，為股市與債市增添強烈的不確定性。
     </div>
 
     <ul class="key-points">
-        <li>通膨持續高於聯準會2%的目標，促使央行官員轉向更具攻擊性的政策立場。</li><li>理事華勒指出，必要時可能需要採取半個百分點（兩碼）的升息來震撼市場以達到控管通膨效果。</li>
+        <li>通膨持續高於聯準會設定的2%目標，正逼使官員採取更為激進的立場。</li><li>華勒指出央行未來不排除透過升息半個百分點（兩碼）來強力打擊通膨。</li>
     </ul>
 
     <div class="card-footer">

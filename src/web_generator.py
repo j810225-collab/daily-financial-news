@@ -31,6 +31,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             --pill-bg: #21262d;
             --pill-text: #58a6ff;
             --pill-border: #30363d;
+            --hero-border: #58a6ff;
+            --hero-bg: linear-gradient(180deg, rgba(88, 166, 255, 0.06) 0%, #161b22 100%);
+            --hero-badge-bg: linear-gradient(135deg, #e3b341 0%, #d29922 100%);
+            --hero-badge-text: #000000;
         }
 
         body.light-theme {
@@ -56,6 +60,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             --pill-bg: #f0f4f9;
             --pill-text: #0969da;
             --pill-border: #d0d7de;
+            --hero-border: #0969da;
+            --hero-bg: linear-gradient(180deg, #f6faff 0%, #ffffff 100%);
+            --hero-badge-bg: linear-gradient(135deg, #d29922 0%, #9a6700 100%);
+            --hero-badge-text: #ffffff;
         }
 
         * {
@@ -229,6 +237,29 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             border-color: var(--card-hover-border);
         }
 
+        /* 建議 1：第 1 則頭條突出 Hero Card */
+        .news-card.hero-card {
+            background: var(--hero-bg);
+            border: 2px solid var(--hero-border);
+            box-shadow: 0 6px 24px rgba(88, 166, 255, 0.15);
+            position: relative;
+        }
+
+        .hero-banner {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--hero-badge-bg);
+            color: var(--hero-badge-text);
+            font-size: 0.76rem;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
         .card-header {
             display: flex;
             justify-content: space-between;
@@ -258,6 +289,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             margin-bottom: 6px;
             color: var(--text-title);
             line-height: 1.45;
+        }
+
+        /* 頭條標題特別放大突出 */
+        .hero-card .card-title {
+            font-size: clamp(1.3rem, 3.8vw, 1.55rem);
+            font-weight: 800;
+            line-height: 1.4;
         }
 
         .original-title {
@@ -337,7 +375,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             font-size: 0.85rem;
         }
 
-        /* 針對小螢幕 (< 480px) 極致緊湊優化 */
         @media (max-width: 480px) {
             .pulse-header {
                 flex-direction: column;
@@ -348,6 +385,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             }
             .card-title {
                 font-size: 1.12rem;
+            }
+            .hero-card .card-title {
+                font-size: 1.25rem;
             }
             .importance-box {
                 font-size: 0.88rem;
@@ -437,7 +477,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 def generate_html(digest_data, output_file="index.html"):
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    # 兼容舊版 list 或新版 dict 結構
     if isinstance(digest_data, dict):
         market_overview = digest_data.get("market_overview", "今日全球財經焦點速覽，即時掌握關鍵脈動。")
         topics = digest_data.get("trending_topics", ["全球市場", "總體經濟", "產業分析"])
@@ -447,7 +486,6 @@ def generate_html(digest_data, output_file="index.html"):
         topics = ["全球市場", "總體經濟", "產業分析"]
         articles = digest_data if isinstance(digest_data, list) else []
 
-    # 產生主題膠囊標籤 HTML
     topic_pills_html = "".join([f'<span class="topic-pill">#{t.lstrip("#")}</span>' for t in topics])
 
     cards = []
@@ -459,7 +497,13 @@ def generate_html(digest_data, output_file="index.html"):
         importance = item.get("importance", "")
         link = item.get("link", "#")
 
-        card = f"""<article class="news-card">
+        # 建議 1：第 1 則頭條賦予 Hero Card 樣式與頭條徽章
+        is_hero = (rank == 1)
+        hero_class = "hero-card" if is_hero else ""
+        hero_badge_html = '<div class="hero-banner">★ 今日焦點頭條 (Top Story)</div>' if is_hero else ""
+
+        card = f"""<article class="news-card {hero_class}">
+    {hero_badge_html}
     <div class="card-header">
         <span class="source-tag">{source}</span>
         <span class="rank-badge">#{rank}</span>
