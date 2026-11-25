@@ -31,12 +31,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  run-and-deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
       - name: 檢出專案代碼
         uses: actions/checkout@v4
@@ -103,6 +99,16 @@ jobs:
         with:
           path: '.'
 
+      - name: 等待 Artifact 同步緩衝
+        run: sleep 5
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: 部署至 GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
